@@ -6,10 +6,8 @@ import com.kotlindiscord.kord.extensions.commands.converters.impl.channel
 import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.types.edit
 import com.kotlindiscord.kord.extensions.types.respond
-import de.l4zs.rolebot.core.io.Database
+import de.l4zs.rolebot.core.io.RoleBotDatabase
 import de.l4zs.rolebot.core.io.findGuild
-import de.l4zs.rolebot.util.confirmation
-import de.l4zs.rolebot.util.safeGuild
 import dev.kord.common.entity.*
 import dev.kord.core.Kord
 import dev.kord.core.behavior.channel.createMessage
@@ -21,6 +19,8 @@ import dev.kord.core.supplier.EntitySupplyStrategy
 import dev.kord.rest.builder.component.ActionRowBuilder
 import dev.kord.rest.builder.message.modify.actionRow
 import dev.kord.rest.builder.message.modify.embed
+import dev.schlaubi.mikbot.plugin.api.util.confirmation
+import dev.schlaubi.mikbot.plugin.api.util.safeGuild
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import java.util.*
@@ -48,7 +48,7 @@ suspend fun SettingsModule.roleChannelCommand() {
 
         action {
 
-            val guildSettings = database.guildSettings.findGuild(safeGuild)
+            val guildSettings = RoleBotDatabase.guildSettings.findGuild(safeGuild)
 
             if (guildSettings.roleChannelData != null) {
                 val (confirmed) = confirmation {
@@ -85,7 +85,7 @@ suspend fun SettingsModule.roleChannelCommand() {
 
             message.pin("Main Role Channel message")
 
-            database.guildSettings.save(
+            RoleBotDatabase.guildSettings.save(
                 guildSettings.copy(
                     roleChannelData = RoleChannelData(
                         roleChannel = arguments.channel.id,
@@ -96,7 +96,6 @@ suspend fun SettingsModule.roleChannelCommand() {
 
             updateMessage(
                 safeGuild.id,
-                database,
                 this@ephemeralSlashCommand.kord,
                 true
             )
@@ -113,11 +112,10 @@ suspend fun SettingsModule.roleChannelCommand() {
 
 suspend fun updateMessage(
     guildId: Snowflake,
-    database: Database,
     kord: Kord,
     initialUpdate: Boolean = false
 ) {
-    findMessageSafe(database, guildId, kord)?.edit {
+    findMessageSafe(guildId, kord)?.edit {
         if (initialUpdate) {
             // Clear initial loading text
             // This requires the content to be explicitly an empty string
@@ -131,13 +129,13 @@ suspend fun updateMessage(
                 "",
             )
             desc.addAll(
-                database.roles.find().toList().filter { it.guildId == guildId }.map { it.label + " - " + kord.getGuild(guildId)?.getRole(it.roleId)?.mention }
+                RoleBotDatabase.roles.find().toList().filter { it.guildId == guildId }.map { it.label + " - " + kord.getGuild(guildId)?.getRole(it.roleId)?.mention }
             )
             description = desc.joinToString("\n")
         }
-        if (database.roles.find().toList().any { it.guildId == guildId }) {
+        if (RoleBotDatabase.roles.find().toList().any { it.guildId == guildId }) {
             actionRow {
-                database.roles.find().toList().filter { it.guildId == guildId }.forEach {
+                RoleBotDatabase.roles.find().toList().filter { it.guildId == guildId }.forEach {
                     roleButton(it.roleId.value.toString(), it.label)
                 }
             }
@@ -145,15 +143,15 @@ suspend fun updateMessage(
     }
 }
 
-suspend fun findMessageSafe(database: Database, guildId: Snowflake, kord: Kord): Message? {
-    val guildSettings = database.guildSettings.findOneById(guildId)
+suspend fun findMessageSafe(guildId: Snowflake, kord: Kord): Message? {
+    val guildSettings = RoleBotDatabase.guildSettings.findOneById(guildId)
     val (channelId, messageId) = guildSettings?.roleChannelData ?: return null
 
     val message = kord.getGuild(guildId)?.getChannelOfOrNull<TextChannel>(channelId)?.getMessageOrNull(messageId)
 
     // if the message is not found, disable the feature
     if (message == null) {
-        database.guildSettings.save(guildSettings.copy(roleChannelData = null))
+        RoleBotDatabase.guildSettings.save(guildSettings.copy(roleChannelData = null))
     }
 
     return message

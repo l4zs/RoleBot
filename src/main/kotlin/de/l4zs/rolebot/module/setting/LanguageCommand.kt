@@ -5,6 +5,7 @@ import com.kotlindiscord.kord.extensions.commands.application.slash.converters.i
 import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.i18n.SupportedLocales
 import com.kotlindiscord.kord.extensions.types.respond
+import de.l4zs.rolebot.core.io.RoleBotDatabase
 import de.l4zs.rolebot.core.io.findUser
 import java.util.*
 
@@ -26,9 +27,9 @@ suspend fun SettingsModule.languageCommand() {
         action {
             val locale = Locale.forLanguageTag(arguments.language)
 
-            val botUser = database.users.findUser(user)
+            val botUser = RoleBotDatabase.users.findUser(user)
             val newUser = botUser.copy(language = locale)
-            database.users.save(newUser)
+            RoleBotDatabase.users.save(newUser)
 
             respond { content = translate("commands.language.changed", arrayOf(arguments.language)) }
         }
