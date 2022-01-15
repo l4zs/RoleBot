@@ -1,15 +1,17 @@
 package de.l4zs.rolebot.module.role
 
 import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.*
+import com.kotlindiscord.kord.extensions.commands.converters.impl.role
+import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
+import de.l4zs.rolebot.core.io.RoleBotDatabase
 import de.l4zs.rolebot.core.io.findGuild
 import de.l4zs.rolebot.module.setting.SettingsModule
 import de.l4zs.rolebot.module.setting.guildAdminOnly
 import de.l4zs.rolebot.module.setting.updateMessage
-import de.l4zs.rolebot.util.safeGuild
 import dev.kord.common.entity.Permission
+import dev.schlaubi.mikbot.plugin.api.util.safeGuild
 
 private class RoleArguments : Arguments() {
     val role by role(
@@ -39,9 +41,9 @@ suspend fun SettingsModule.addRoleCommand() {
                 return@action
             }
 
-            val guildSettings = database.guildSettings.findGuild(safeGuild)
+            val guildSettings = RoleBotDatabase.guildSettings.findGuild(safeGuild)
 
-            val roles = database.roles.find().toList().filter { it.guildId == safeGuild.id }.map { it.roleId }
+            val roles = RoleBotDatabase.roles.find().toList().filter { it.guildId == safeGuild.id }.map { it.roleId }
 
             if (roles.contains(arguments.role.id)) {
                 respond {
@@ -53,7 +55,7 @@ suspend fun SettingsModule.addRoleCommand() {
                 return@action
             }
 
-            database.roles.insertOne(
+            RoleBotDatabase.roles.insertOne(
                 Role(
                     arguments.role.id,
                     arguments.label,
@@ -64,7 +66,6 @@ suspend fun SettingsModule.addRoleCommand() {
             if (guildSettings.roleChannelData != null) {
                 updateMessage(
                     guildSettings.guildId,
-                    database,
                     this@ephemeralSlashCommand.kord
                 )
             }

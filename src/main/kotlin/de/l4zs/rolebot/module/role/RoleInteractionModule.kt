@@ -3,19 +3,17 @@ package de.l4zs.rolebot.module.role
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.hasRole
-import de.l4zs.rolebot.core.io.Database
+import de.l4zs.rolebot.core.io.RoleBotDatabase
 import de.l4zs.rolebot.core.io.findGuild
-import de.l4zs.rolebot.util.respondIfFailed
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.interaction.edit
 import dev.kord.core.event.interaction.ComponentInteractionCreateEvent
-import org.koin.core.component.inject
+import dev.schlaubi.mikbot.plugin.api.util.respondIfFailed
 
 class RoleInteractionModule : Extension() {
 
     override val name = "role interaction handler"
     override val bundle: String = "button"
-    private val database: Database by inject()
 
     override suspend fun setup() {
         event<ComponentInteractionCreateEvent> {
@@ -24,7 +22,7 @@ class RoleInteractionModule : Extension() {
                     val interaction = this.event.interaction
                     val message = interaction.message
                     val guild = message?.getGuild()
-                    val guildSettings = guild?.let { database.guildSettings.findGuild(it) }
+                    val guildSettings = guild?.let { RoleBotDatabase.guildSettings.findGuild(it) }
 
                     /* return */
                     interaction.user.isBot ||
@@ -46,7 +44,7 @@ class RoleInteractionModule : Extension() {
                 }
                 val member = guild.getMember(event.interaction.user.id)
                 val role = try {
-                    database.roles.find().toList().first { it.roleId == Snowflake(interaction.componentId.toLong()) }
+                    RoleBotDatabase.roles.find().toList().first { it.roleId == Snowflake(interaction.componentId.toLong()) }
                 } catch (e: NoSuchElementException) {
                     e.printStackTrace()
                     ack.edit {
