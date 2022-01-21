@@ -1,3 +1,7 @@
+import dev.schlaubi.mikbot.gradle.GenerateDefaultTranslationBundleTask
+import java.util.Locale
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
@@ -34,11 +38,37 @@ kotlin {
 }
 
 tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "17"
             freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xopt-in=kotlin.time.ExperimentalTime", "-Xopt-in=io.ktor.locations.KtorExperimentalLocationsAPI")
         }
+    }
+
+    task<Copy>("buildAndInstall") {
+        group = "build"
+        dependsOn(assemblePlugin)
+        from(assemblePlugin)
+        include("*.zip")
+        into("plugins")
+    }
+
+    val generateDefaultResourceBundle = task<GenerateDefaultTranslationBundleTask>("generateDefaultResourceBundle") {
+        defaultLocale.set(Locale("en", "GB"))
+    }
+
+    assemblePlugin {
+        dependsOn(generateDefaultResourceBundle)
+    }
+
+    installBot {
+        botVersion.set("2.1.0-SNAPSHOT-SNAPSHOT")
+    }
+
+    buildRepository {
+        repositoryUrl.set("https://role-bot-repo.l4zs.de")
+        targetDirectory.set(rootProject.file("ci-repo").toPath())
+        projectUrl.set("https://github.com/l4zs/rolebot")
     }
 }
 
@@ -47,4 +77,3 @@ mikbotPlugin {
     license.set("l4zs forogot to make a LICENSE file (idiot)")
     description.set("l4zs' cool self-hosted role-bot.")
 }
-
