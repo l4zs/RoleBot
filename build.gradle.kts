@@ -1,48 +1,28 @@
-import dev.schlaubi.mikbot.gradle.GenerateDefaultTranslationBundleTask
 import java.util.Locale
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("com.google.devtools.ksp") version "1.6.0-1.0.1"
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    id("dev.schlaubi.mikbot.gradle-plugin") version "1.3.2"
-}
-
-ktlint {
-    disabledRules.set(listOf("no-wildcard-imports"))
+    id("com.google.devtools.ksp") version "1.7.0-1.0.6"
+    kotlin("jvm") version "1.7.0"
+    kotlin("plugin.serialization") version "1.7.0"
+    id("dev.schlaubi.mikbot.gradle-plugin") version "2.3.6"
 }
 
 group = "de.l4zs"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
-    maven("https://schlaubi.jfrog.io/artifactory/mikbot/")
-    maven("https://schlaubi.jfrog.io/artifactory/envconf/")
-    maven("https://maven.kotlindiscord.com/repository/maven-public/")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
-    // this one is included in the bot itself, therefore we make it compileOnly
-    compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly("dev.schlaubi", "mikbot-api", "2.0.1")
-    ksp("dev.schlaubi", "mikbot-plugin-processor", "1.0.0")
-}
-
-kotlin {
-    jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    mikbot("dev.schlaubi", "mikbot-api", "3.2.0-SNAPSHOT")
+    ksp("dev.schlaubi", "mikbot-plugin-processor", "2.2.0")
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xopt-in=kotlin.time.ExperimentalTime", "-Xopt-in=io.ktor.locations.KtorExperimentalLocationsAPI")
-        }
+    compileKotlin {
+        kotlinOptions.jvmTarget = "18"
     }
 
     task<Copy>("buildAndInstall") {
@@ -53,7 +33,7 @@ tasks {
         into("plugins")
     }
 
-    val generateDefaultResourceBundle = task<GenerateDefaultTranslationBundleTask>("generateDefaultResourceBundle") {
+    val generateDefaultResourceBundle = task<dev.schlaubi.mikbot.gradle.GenerateDefaultTranslationBundleTask>("generateDefaultResourceBundle") {
         defaultLocale.set(Locale("en", "GB"))
     }
 
@@ -61,19 +41,27 @@ tasks {
         dependsOn(generateDefaultResourceBundle)
     }
 
-    installBot {
-        botVersion.set("2.1.0-SNAPSHOT-SNAPSHOT")
+    assembleBot {
+
     }
 
-    buildRepository {
-        repositoryUrl.set("https://role-bot-repo.l4zs.de")
+    installBot {
+        botVersion.set("3.2.0-SNAPSHOT")
+    }
+
+    pluginPublishing {
+        // The address your repository is hosted it
+        // if you use Git LFS and GitHub Pages use https://github.com/owner/repo/raw/branch
+        repositoryUrl.set("https://github.com/l4zs/RoleBotRewrite/raw/main")
+        // The directory the generated repository should be in
         targetDirectory.set(rootProject.file("ci-repo").toPath())
-        projectUrl.set("https://github.com/l4zs/rolebot")
+        // The URL of the project
+        projectUrl.set("https://github.com/l4zs/RoleBotRewrite")
     }
 }
 
 mikbotPlugin {
+    description.set("RoleBot")
     provider.set("l4zs")
-    license.set("l4zs forogot to make a LICENSE file (idiot)")
-    description.set("l4zs' cool self-hosted role-bot.")
+    license.set("GPLv3")
 }
