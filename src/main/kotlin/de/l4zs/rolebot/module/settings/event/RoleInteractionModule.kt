@@ -1,4 +1,4 @@
-package de.l4zs.rolebot.module
+package de.l4zs.rolebot.module.settings.event
 
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.hasRole

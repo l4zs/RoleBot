@@ -1,10 +1,10 @@
 import java.util.Locale
 
 plugins {
-    id("com.google.devtools.ksp") version "1.7.0-1.0.6"
-    kotlin("jvm") version "1.7.0"
-    kotlin("plugin.serialization") version "1.7.0"
-    id("dev.schlaubi.mikbot.gradle-plugin") version "2.3.6"
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
+    id("dev.schlaubi.mikbot.gradle-plugin") version "2.5.0"
 }
 
 group = "de.l4zs"
@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    mikbot("dev.schlaubi", "mikbot-api", "3.2.0-SNAPSHOT")
-    ksp("dev.schlaubi", "mikbot-plugin-processor", "2.2.0")
+    mikbot("dev.schlaubi", "mikbot-api", "3.8.0-SNAPSHOT")
+    ksp("dev.schlaubi", "mikbot-plugin-processor", "2.2.1")
 }
 
 tasks {
@@ -46,7 +46,7 @@ tasks {
     }
 
     installBot {
-        botVersion.set("3.2.0-SNAPSHOT")
+        botVersion.set("3.8.0-SNAPSHOT")
     }
 
     pluginPublishing {

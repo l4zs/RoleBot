@@ -40,7 +40,7 @@ private class AddRoleCommandArguments : Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }
@@ -68,9 +68,9 @@ suspend fun SettingsModule.addRoleCommand() {
         action {
             val role = arguments.role
             val messageTitle = arguments.roleMessage
-            val label = arguments.label ?: role.name
-            val description = arguments.description ?: ""
+            val description = arguments.description
             val emoji = arguments.emoji
+            val label = arguments.label ?: if (emoji == null) role.name else ""
 
             val guildData = PluginDatabase.guilds.findGuild(safeGuild)
             val roleMessage = guildData.roleMessages?.find { it.title == messageTitle }
@@ -84,7 +84,8 @@ suspend fun SettingsModule.addRoleCommand() {
 
             if (roleMessage.roles?.any { it.roleId == role.id } == true) {
                 respond {
-                    content = "Role ${role.mention} is already in the role message '$messageTitle'"
+                    content =
+                        "Role ${role.mention} is already in the role message `$messageTitle`, use the `/edit-role` command to edit it"
                 }
                 return@action
             }

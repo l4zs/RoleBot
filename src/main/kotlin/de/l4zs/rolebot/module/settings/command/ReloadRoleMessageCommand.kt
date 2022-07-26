@@ -13,7 +13,7 @@ import dev.schlaubi.mikbot.plugin.api.settings.guildAdminOnly
 import dev.schlaubi.mikbot.plugin.api.util.kord
 import dev.schlaubi.mikbot.plugin.api.util.safeGuild
 
-private class ReloadRoleMessageCommandArguments: Arguments() {
+private class ReloadRoleMessageCommandArguments : Arguments() {
     val roleMessage by string {
         name = "role-message"
         description = "The message to which the role should be added"
@@ -25,7 +25,7 @@ private class ReloadRoleMessageCommandArguments: Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }

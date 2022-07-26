@@ -14,7 +14,7 @@ import dev.schlaubi.mikbot.plugin.api.util.confirmation
 import dev.schlaubi.mikbot.plugin.api.util.kord
 import dev.schlaubi.mikbot.plugin.api.util.safeGuild
 
-private class RemoveRoleMessageCommandArguments: Arguments() {
+private class RemoveRoleMessageCommandArguments : Arguments() {
     val title by string {
         name = "title"
         description = "The title of the role selection message"
@@ -26,7 +26,7 @@ private class RemoveRoleMessageCommandArguments: Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }

@@ -27,13 +27,11 @@ class RoleBot(wrapper: PluginWrapper) : Plugin(wrapper) {
      * Add new extensions.
      */
     override fun ExtensibleBotBuilder.ExtensionsBuilder.addExtensions() {
-
     }
 
     /**
      * This is being executed directly after the bot got started.
      */
     override fun CoroutineScope.atLaunch(bot: ExtensibleBot) {
-
     }
 }

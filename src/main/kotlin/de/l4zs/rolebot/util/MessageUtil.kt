@@ -33,11 +33,8 @@ suspend fun updateMessage(
                 val role = guild.getRole(it.roleId)
                 field {
                     inline = false
-                    value = ""
-                    if (it.emoji != null) {
-                        value = "<:${it.emoji.name}:${it.emoji.id}> "
-                    }
-                    value += "**${it.label} - ${role.mention}**\n${it.description ?: ""}"
+                    value = if (it.emoji != null) "<:${it.emoji.name}:${it.emoji.id}> " else "" +
+                            "**${it.label} - ${role.mention}**\n${it.description ?: ""}"
                 }
             }
         }

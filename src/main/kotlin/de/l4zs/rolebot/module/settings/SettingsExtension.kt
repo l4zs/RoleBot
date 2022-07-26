@@ -1,6 +1,6 @@
 package de.l4zs.rolebot.module.settings
 
-import de.l4zs.rolebot.module.roleInteraction
+import de.l4zs.rolebot.module.settings.event.roleInteraction
 import de.l4zs.rolebot.module.settings.command.addRoleCommand
 import de.l4zs.rolebot.module.settings.command.createRoleMessageCommand
 import de.l4zs.rolebot.module.settings.command.editRoleCommand
@@ -9,9 +9,11 @@ import de.l4zs.rolebot.module.settings.command.reloadRoleMessageCommand
 import de.l4zs.rolebot.module.settings.command.removeRoleCommand
 import de.l4zs.rolebot.module.settings.command.removeRoleMessageCommand
 import dev.kord.common.entity.PresenceStatus
-import dev.kord.core.Kord
+import dev.kord.core.on
 import dev.schlaubi.mikbot.plugin.api.settings.SettingsExtensionPoint
 import dev.schlaubi.mikbot.plugin.api.settings.SettingsModule
+import dev.schlaubi.mikbot.plugin.api.util.AllShardsReadyEvent
+import kotlinx.coroutines.delay
 import org.pf4j.Extension
 
 @Extension
@@ -28,12 +30,12 @@ class SettingsExtension : SettingsExtensionPoint {
         removeRoleCommand()
 
         roleInteraction()
-    }
-}
-
-suspend fun setPresence(kord: Kord) {
-    kord.editPresence {
-        status = PresenceStatus.Online
-        playing("Kotlin")
+        kord.on<AllShardsReadyEvent> {
+            delay(1000)
+            kord.editPresence {
+                status = PresenceStatus.Online
+                playing("Kotlin")
+            }
+        }
     }
 }

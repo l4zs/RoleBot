@@ -14,7 +14,7 @@ import dev.schlaubi.mikbot.plugin.api.settings.guildAdminOnly
 import dev.schlaubi.mikbot.plugin.api.util.kord
 import dev.schlaubi.mikbot.plugin.api.util.safeGuild
 
-private class EditRoleMessageCommandArgument: Arguments() {
+private class EditRoleMessageCommandArgument : Arguments() {
     val oldTitle by string {
         name = "title"
         description = "The old title of the role selection message"
@@ -26,7 +26,7 @@ private class EditRoleMessageCommandArgument: Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }

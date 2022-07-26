@@ -32,7 +32,7 @@ private class RemoveRoleCommandArguments : Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }

@@ -36,7 +36,7 @@ private class EditRoleCommandArguments : Arguments() {
             val roleMessages = guildData.roleMessages ?: return@autoComplete
 
             suggestStringMap(
-                roleMessages.map { it.title to it.title }.toMap()
+                roleMessages.associate { it.title to it.title }
             )
         }
     }
@@ -73,9 +73,9 @@ suspend fun OwnerModule.ownerEditRoleCommand() {
             val roleId = arguments.roleId
             val role = guild.getRole(roleId)
             val messageTitle = arguments.roleMessage
-            val label = arguments.label ?: role.name
             val description = arguments.description ?: ""
             val emoji = arguments.emoji
+            val label = arguments.label ?: if (emoji == null) role.name else ""
 
             val guildData = PluginDatabase.guilds.findGuild(guild)
             val roleMessage = guildData.roleMessages?.find { it.title == messageTitle }

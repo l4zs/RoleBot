@@ -1,12 +1,12 @@
 package de.l4zs.rolebot.core.io
 
+import com.kotlindiscord.kord.extensions.koin.KordExKoinComponent
 import dev.kord.core.behavior.GuildBehavior
 import dev.schlaubi.mikbot.plugin.api.io.getCollection
 import dev.schlaubi.mikbot.plugin.api.util.database
-import org.koin.core.component.KoinComponent
 import org.litote.kmongo.coroutine.CoroutineCollection
 
-object PluginDatabase : KoinComponent {
+object PluginDatabase : KordExKoinComponent {
     val guilds = database.getCollection<GuildData>("guilds")
 }
 
